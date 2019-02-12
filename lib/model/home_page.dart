@@ -1,5 +1,5 @@
 import 'package:app_fire/model/form_page.dart';
-import 'package:app_fire/planets.dart';
+import 'package:app_fire/animal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +39,7 @@ class MyApp extends StatefulWidget {
   createState() => HomePageBody();
 }
 class HomePageBody extends State<MyApp> {
-  final List<Planet> planets = [];
-  final List<Widget> planetRow = [];
+  final List<Animal> animals = [];
   final mainReference = FirebaseDatabase.instance.reference();
   static var stream; // state variable
 
@@ -73,12 +72,12 @@ class HomePageBody extends State<MyApp> {
   loadListView() {
     return new ListView.builder(
         shrinkWrap: true,
-        itemCount: planets.length,
+        itemCount: animals.length,
         itemBuilder: (BuildContext ctxt, int index) {
           return Dismissible(
-              key: ObjectKey(planets[index]),
+              key: ObjectKey(animals[index]),
               child: Container(
-                  padding: EdgeInsets.all(20.0), child: item(planets[index])),
+                  padding: EdgeInsets.all(20.0), child: item(animals[index])),
               onDismissed: (direction) {
                 deleteItem(index);
               });
@@ -88,8 +87,8 @@ class HomePageBody extends State<MyApp> {
   void deleteItem(index){
 
     setState((){
-      FirebaseDatabase.instance.reference().child('animal').child(planets[index].key).remove();
-      planets.removeAt(index);
+      FirebaseDatabase.instance.reference().child('animal').child(animals[index].key).remove();
+      animals.removeAt(index);
     });
   }
 
@@ -99,10 +98,10 @@ class HomePageBody extends State<MyApp> {
   index {index}
   */
     setState((){
-      planets.insert(index, item);
+      animals.insert(index, item);
     });
   }
-  Widget item(Planet planet) {
+  Widget item(Animal animal) {
     return new Card(
       child: new Column(
         children: <Widget>[
@@ -123,7 +122,7 @@ class HomePageBody extends State<MyApp> {
                   new Padding(
                     padding: new EdgeInsets.all(7.0),
                     child: new Text(
-                      planet.specie,
+                      animal.specie,
                       style: new TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -133,7 +132,7 @@ class HomePageBody extends State<MyApp> {
                   ),
                   new Padding(
                     padding: new EdgeInsets.all(7.0),
-                    child: new Text(planet.gender,
+                    child: new Text(animal.gender,
                         style: new TextStyle(fontSize: 18.0)),
                   ),new Padding(
                     padding: new EdgeInsets.all(7.0),
@@ -142,7 +141,7 @@ class HomePageBody extends State<MyApp> {
                   new Padding(
                     padding: new EdgeInsets.all(7.0),
                     child: new Text(
-                      planet.age,
+                      animal.age,
                       style: new TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -161,8 +160,8 @@ class HomePageBody extends State<MyApp> {
       Map<dynamic, dynamic> map = value[key];
       print("holaaaaaaaaa");
       print(map['name']);
-      planets.add(
-          new Planet(key,map['name'], map['specie'], map['age'], map['gender']));
+      animals.add(
+          new Animal(key,map['name'], map['specie'], map['age'], map['gender']));
     }
   }
 }

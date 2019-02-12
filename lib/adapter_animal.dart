@@ -1,15 +1,15 @@
-import 'package:app_fire/planets.dart';
+import 'package:app_fire/animal.dart';
 import 'package:flutter/material.dart';
 
-class PlanetRow extends StatelessWidget {
+class AnimalRow extends StatelessWidget {
 
-  final Planet planet;
-  PlanetRow(this.planet);
+  final Animal animal;
+  AnimalRow(this.animal);
 
   @override
   Widget build(BuildContext context) {
 
-    print('Connected to second database and planet vista ${planet.name}');
+    print('Connected to second database and planet vista ${animal.name}');
 
     final baseTextStyle = const TextStyle(
         fontFamily: 'Poppins'
@@ -33,7 +33,7 @@ class PlanetRow extends StatelessWidget {
           children: <Widget>[
             new Image.asset(image, height: 12.0),
             new Container(width: 8.0),
-            new Text(planet.specie, style: regularTextStyle),
+            new Text(animal.specie, style: regularTextStyle),
           ]
       );
     }
@@ -48,9 +48,9 @@ class PlanetRow extends StatelessWidget {
         children: <Widget>[
           new Container(height: 4.0),
           new Image.asset("", height: 100.0,fit: BoxFit.fitWidth),
-          new Text(planet.name, style: headerTextStyle),
+          new Text(animal.name, style: headerTextStyle),
           new Container(height: 10.0),
-          new Text(planet.specie, style: subHeaderTextStyle),
+          new Text(animal.specie, style: subHeaderTextStyle),
           new RaisedButton(
             padding: const EdgeInsets.all(8.0),
             textColor: Colors.white,
@@ -61,13 +61,13 @@ class PlanetRow extends StatelessWidget {
             children: <Widget>[
               new Expanded(
                   child: _planetValue(
-                      value: planet.gender,
+                      value: animal.gender,
                       image: 'img/ic_distance.png')
 
               ),
               new Expanded(
                   child: _planetValue(
-                      value: planet.specie,
+                      value: animal.specie,
                       image: 'img/ic_gravity.png')
               )
             ],

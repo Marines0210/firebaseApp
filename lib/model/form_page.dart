@@ -2,26 +2,24 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:app_fire/planets.dart';
+import 'package:app_fire/animal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 //widgets tienen un identificador, y ese es el Key. Fácil.
 class FormPage extends StatefulWidget {
   final String title;
-  final Planet planet;
+  final Animal animal;
 
-  FormPage({Key key, this.title,this.planet}) : super(key: key);
+  FormPage({Key key, this.title,this.animal}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return new MyFormPageState(planet);
+    return new MyFormPageState(animal);
   }
 }
 
@@ -33,11 +31,11 @@ class MyFormPageState extends State<FormPage> {
   final ageController = TextEditingController();
   final imageController = TextEditingController();
   String genderValue = '';
-  Planet planet;
+  Animal animal;
 
   final animalDb = FirebaseDatabase.instance.reference().child('animal');
 
-  MyFormPageState(this.planet);
+  MyFormPageState(this.animal);
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -135,9 +133,6 @@ class MyFormPageState extends State<FormPage> {
 
       PictureRecorder recorder = new PictureRecorder();
       DateTime now = new DateTime.now();
-      var datestamp = new DateFormat("yyyyMMdd'T'HHmmss");
-      String currentdate = datestamp.format(now);
-      File _videoGallery = await ImagePicker.pickImage(source: ImageSource.gallery);
 
       final picture = recorder.endRecording();
       final img = picture.toImage(640, 360);
@@ -147,11 +142,12 @@ class MyFormPageState extends State<FormPage> {
       final Directory systemTempDir = Directory.systemTemp;
       final File file = await new File('${systemTempDir.path}/foo.png').create();
       file.writeAsBytes(finalImage);
-      final StorageReference ref = FirebaseStorage.instance.ref().child('images').child("$currentdate.jpg");
+
+      final StorageReference ref = FirebaseStorage.instance.ref().child('images').child("ssssss.jpg");
       final StorageUploadTask uploadTask = ref.putFile(file);
 
       String url = await ref.getDownloadURL() as String;
-      this.planet.image = url;
+      this.animal.image = url;
 
       print(url);
 

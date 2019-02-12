@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       //Agregamos el titulo de appbar
-      title: "Planets",
+      title: "Animals",
       home: new HomePage(),
 
     );

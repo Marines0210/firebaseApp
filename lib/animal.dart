@@ -1,5 +1,5 @@
 
-class Planet {
+class Animal {
 
    String key;
    String name;
@@ -9,6 +9,6 @@ class Planet {
    String gender;
 
 
-   Planet(this.key,this.name,this.specie, this.age, this.gender);
+   Animal(this.key,this.name,this.specie, this.age, this.gender);
 
 }
