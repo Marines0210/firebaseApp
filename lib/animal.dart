@@ -5,10 +5,11 @@ class Animal {
    String name;
    String specie;
    String age;
-   String image;
    String gender;
+   String image;
 
 
-   Animal(this.key,this.name,this.specie, this.age, this.gender);
+   Animal(this.key,this.name,this.specie, this.age, this.gender,this.image);
+
 
 }

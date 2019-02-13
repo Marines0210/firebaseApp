@@ -1,19 +1,29 @@
+import 'package:app_fire/Auth.dart';
+import 'package:app_fire/listview_animal.dart';
 import 'package:app_fire/model/form_page.dart';
-import 'package:app_fire/animal.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class HomePage extends StatelessWidget {
+  HomePage({this.auth, this.onSignOut});
+  final BaseAuth auth;
+  final VoidCallback onSignOut;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    void _signOut() async {
+      try {
+        await auth.signOut();
+        onSignOut();
+      } catch (e) {
+        print(e);
+      }
+    }
+      return MaterialApp(
         home: Scaffold(
       floatingActionButton: new FloatingActionButton(
           shape: StadiumBorder(),
           onPressed: () {
-            HomePageBody.stream = HomePageBody.newStream();
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -31,137 +41,12 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      appBar: AppBar(title: const Text('Adopcion')),
+      appBar: AppBar(title: const Text('Adopcion'),
+          actions: <Widget>[   new FlatButton(
+          onPressed: _signOut,
+          child: new Text('Logout', style: new TextStyle(fontSize: 17.0, color: Colors.white))
+      )]),
     ));
   }
 }
-class MyApp extends StatefulWidget {
-  createState() => HomePageBody();
-}
-class HomePageBody extends State<MyApp> {
-  final List<Animal> animals = [];
-  final mainReference = FirebaseDatabase.instance.reference();
-  static var stream; // state variable
 
-  @override
-  void initState() {
-    super.initState();
-    stream = newStream(); // initial stream
-  }
-
-  static Stream<String> newStream() =>
-      Stream.periodic(Duration(seconds: 1), (i) => "$i");
-
-  @override
-  Widget build(BuildContext context) {
-    return new StreamBuilder(
-        stream: FirebaseDatabase.instance.reference().child('animal').onValue,
-        builder: (context, snap) {
-          if (snap.hasError) return new Text('Error: ${snap.error}');
-          if (snap.data == null)
-            return new Center(
-              child: new CircularProgressIndicator(),
-            );
-          loadListView();
-          loadData(snap.data.snapshot);
-          return loadListView();
-        });
-  }
-
-
-  loadListView() {
-    return new ListView.builder(
-        shrinkWrap: true,
-        itemCount: animals.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Dismissible(
-              key: ObjectKey(animals[index]),
-              child: Container(
-                  padding: EdgeInsets.all(20.0), child: item(animals[index])),
-              onDismissed: (direction) {
-                deleteItem(index);
-              });
-
-        });
-  }
-  void deleteItem(index){
-
-    setState((){
-      FirebaseDatabase.instance.reference().child('animal').child(animals[index].key).remove();
-      animals.removeAt(index);
-    });
-  }
-
-  void undoDeletion(index, item){
-    /*
-  This method accepts the parameters index and item and re-inserts the {item} at
-  index {index}
-  */
-    setState((){
-      animals.insert(index, item);
-    });
-  }
-  Widget item(Animal animal) {
-    return new Card(
-      child: new Column(
-        children: <Widget>[
-          new Container(
-            height: 144.0,
-            width: 500.0,
-            color: Colors.green,
-            child: new Image.asset("img/cody.jpg", height: 144.0, width: 160.0),
-          ),
-          new Padding(
-              padding: new EdgeInsets.all(7.0),
-              child: new Row(
-                children: <Widget>[
-                  new Padding(
-                    padding: new EdgeInsets.all(7.0),
-                    child: new Icon(Icons.pets),
-                  ),
-                  new Padding(
-                    padding: new EdgeInsets.all(7.0),
-                    child: new Text(
-                      animal.specie,
-                      style: new TextStyle(fontSize: 18.0),
-                    ),
-                  ),
-                  new Padding(
-                    padding: new EdgeInsets.all(7.0),
-                    child: new Icon(Icons.wc ),
-                  ),
-                  new Padding(
-                    padding: new EdgeInsets.all(7.0),
-                    child: new Text(animal.gender,
-                        style: new TextStyle(fontSize: 18.0)),
-                  ),new Padding(
-                    padding: new EdgeInsets.all(7.0),
-                    child: new Icon(Icons.cake),
-                  ),
-                  new Padding(
-                    padding: new EdgeInsets.all(7.0),
-                    child: new Text(
-                      animal.age,
-                      style: new TextStyle(fontSize: 18.0),
-                    ),
-                  ),
-                ],
-              ))
-        ],
-      ),
-    );
-  }
-
-  void loadData(DataSnapshot snap) async {
-    print(snap.key);
-    print(snap);
-    final value = snap.value as Map;
-    for (final key in value.keys) {
-      Map<dynamic, dynamic> map = value[key];
-      print("holaaaaaaaaa");
-      print(map['name']);
-      animals.add(
-          new Animal(key,map['name'], map['specie'], map['age'], map['gender']));
-    }
-  }
-}

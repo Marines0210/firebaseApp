@@ -1,13 +1,13 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:app_fire/animal.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 //widgets tienen un identificador, y ese es el Key. Fácil.
 class FormPage extends StatefulWidget {
@@ -32,10 +32,12 @@ class MyFormPageState extends State<FormPage> {
   final imageController = TextEditingController();
   String genderValue = '';
   Animal animal;
-
+  File galleryFile;
+  String urlImage;
   final animalDb = FirebaseDatabase.instance.reference().child('animal');
 
   MyFormPageState(this.animal);
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -79,13 +81,15 @@ class MyFormPageState extends State<FormPage> {
                       //Que vamos a permitir en nuestras cajas de texto
                       WhitelistingTextInputFormatter.digitsOnly,
                     ],
-                  ),new RaisedButton(
-                    padding: const EdgeInsets.all(8.0),
-                    textColor: Colors.white,
-                    color: Colors.blue,
-                    onPressed: photoOption ,
-                    child: new Text("Add"),
-                  ),
+                  ), new RaisedButton(
+                      padding: const EdgeInsets.all(8.0),
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      child: new RaisedButton(
+                        child: new Text('Selecciona una imagen'),
+                        onPressed: imageSelectorGallery,
+                      )
+                  ), displaySelectedFile(),
                   new FormField(
                     builder: (FormFieldState state) {
                       return InputDecorator(
@@ -126,44 +130,50 @@ class MyFormPageState extends State<FormPage> {
                 ],
               ))),
     );
-
   }
-  Future<String> photoOption() async {
-    try {
 
-      PictureRecorder recorder = new PictureRecorder();
-      DateTime now = new DateTime.now();
-
-      final picture = recorder.endRecording();
-      final img = picture.toImage(640, 360);
-      final pngBytes = await img.toByteData(format: ImageByteFormat.png);
-      Uint8List finalImage = Uint8List.view(pngBytes.buffer);
-
-      final Directory systemTempDir = Directory.systemTemp;
-      final File file = await new File('${systemTempDir.path}/foo.png').create();
-      file.writeAsBytes(finalImage);
-
-      final StorageReference ref = FirebaseStorage.instance.ref().child('images').child("ssssss.jpg");
-      final StorageUploadTask uploadTask = ref.putFile(file);
-
-      String url = await ref.getDownloadURL() as String;
-      this.animal.image = url;
-
-      print(url);
-
-    } catch (error) {
-      print(error);
-    }
+  imageSelectorGallery() async {
+    galleryFile = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 800.0,
+      maxWidth: 700.0,
+    );
+    print("Imagen seleccionada : " + galleryFile.path);
+    setState(() {});
   }
+
+  Widget displaySelectedFile() {
+    return new SizedBox(
+//child: new Card(child: new Text(''+galleryFile.toString())),
+//child: new Image.file(galleryFile),
+      child: galleryFile == null
+          ? new Text('Foto no seleccionada!!')
+          : new Image.file(galleryFile),
+    );
+  }
+
+
   void sendData() {
-    animalDb.push().set({
-      'name': nameController.text,
-      'specie': specieController.text,
-      'age': ageController.text,
-      'gender': genderValue,
-    }).then((_) {
-      //cerrar la ventana actual cerrar el contexto actual
-      Navigator.pop(context);
+    saveImageFirebase(nameController.text).then((_){
+      animalDb.push().set({
+        'name': nameController.text,
+        'specie': specieController.text,
+        'age': ageController.text,
+        'gender': genderValue,
+        'image': (urlImage)!=null?urlImage:"",
+      }).then((_) {
+        //cerrar la ventana actual cerrar el contexto actual
+        Navigator.pop(context);
+      });
     });
+
+  }
+  Future<void> saveImageFirebase(String imageId) async {
+    StorageReference ref = FirebaseStorage.instance.ref().child("pets").child(
+        imageId);
+    StorageUploadTask uploadTask = ref.putFile(galleryFile);
+    final StorageTaskSnapshot downloadUrl =(await uploadTask.onComplete);
+    urlImage = (await downloadUrl.ref.getDownloadURL());
+    print('URL Is $urlImage');
   }
 }
