@@ -1,6 +1,6 @@
 
-import 'package:app_fire/animal.dart';
-import 'package:app_fire/model/form_page.dart';
+import 'package:app_fire/classes/animal.dart';
+import 'package:app_fire/model/animal_form_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -21,7 +21,7 @@ class CardAnimal extends StatelessWidget {
           Navigator.push(
               this.context,
               MaterialPageRoute(
-                  builder: (context) => FormPage(title: 'Nuevo animal',animal: animal)));
+                  builder: (context) => FormAnimal(title: 'Nuevo animal',animal: animal)));
         },
       child: new Card(
       child: new Column(

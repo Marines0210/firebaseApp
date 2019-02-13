@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:app_fire/animal.dart';
+import 'package:app_fire/classes/animal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,11 +10,11 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 //widgets tienen un identificador, y ese es el Key. Fácil.
-class FormPage extends StatefulWidget {
+class FormAnimal extends StatefulWidget {
   final String title;
   final Animal animal;
 
-  FormPage({Key key, this.title,this.animal}) : super(key: key);
+  FormAnimal({Key key, this.title,this.animal}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -23,7 +23,7 @@ class FormPage extends StatefulWidget {
   }
 }
 
-class MyFormPageState extends State<FormPage> {
+class MyFormPageState extends State<FormAnimal> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   List<String> genders = <String>['', 'Macho', 'Hembra'];
   final nameController = TextEditingController();
@@ -155,28 +155,13 @@ class MyFormPageState extends State<FormPage> {
 
   Widget displaySelectedFile() {
     return new SizedBox(
-//child: new Card(child: new Text(''+galleryFile.toString())),
-//child: new Image.file(galleryFile),
-      child:imageLoad()
+      child: (galleryFile == null)
+          ?  new Text('Foto no seleccionada!!')
+          : new Image.file(galleryFile),
     );
   }
 
-  imageLoad(){
-    if(galleryFile == null){
-      if(animal!="" && animal.image!=null || animal.image!=""){
-        FadeInImage.assetNetwork(
-            placeholder: "img/cody.jpg",
-            image: animal.image,
-            height: 144.0,
-            width: 160.0
-        );
-      }else{
-        new Text('Foto no seleccionada!!');
-      }
-    }else{
-      new Image.file(galleryFile);
-    }
-  }
+
 
   void sendData() {
     if(animal!=null){

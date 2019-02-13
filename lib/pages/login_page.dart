@@ -1,5 +1,5 @@
-import 'package:app_fire/Auth.dart';
-import 'package:app_fire/model/home_page.dart';
+import 'package:app_fire/classes/Auth.dart';
+import 'package:app_fire/model/animal_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {

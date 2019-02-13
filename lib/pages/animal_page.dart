@@ -1,6 +1,6 @@
-import 'package:app_fire/Auth.dart';
-import 'package:app_fire/listview_animal.dart';
-import 'package:app_fire/model/form_page.dart';
+import 'package:app_fire/classes/Auth.dart';
+import 'package:app_fire/widgets/listview_animal.dart';
+import 'package:app_fire/model/animal_form_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -27,20 +27,15 @@ class HomePage extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => FormPage(title: 'Nuevo animal')));
+                    builder: (context) => FormAnimal(title: 'Nuevo animal')));
           },
           backgroundColor: Colors.redAccent,
           child: Icon(
             Icons.add,
             size: 20.0,
           )),
-      body: new SingleChildScrollView(
-        child: new Column(
-          children: <Widget>[
-            new MyApp(context),
-          ],
-        ),
-      ),
+      body:  new ListViewAnimal(context)
+          ,
       appBar: AppBar(title: const Text('Adopcion'),
           actions: <Widget>[   new FlatButton(
           onPressed: _signOut,

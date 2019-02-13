@@ -1,23 +1,23 @@
-import 'package:app_fire/animal.dart';
-import 'package:app_fire/card_animal.dart';
+import 'package:app_fire/classes/animal.dart';
+import 'package:app_fire/widgets/card_animal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MyApp extends StatefulWidget {
+class ListViewAnimal extends StatefulWidget {
   BuildContext context;
 
-  MyApp(this.context);
+  ListViewAnimal(this.context);
 
-  createState() => HomePageBody(this.context);
+  createState() => ListViewAnimalState(this.context);
 }
 
-class HomePageBody extends State<MyApp> {
+class ListViewAnimalState extends State<ListViewAnimal> {
   final List<Animal> animals = [];
   final mainReference = FirebaseDatabase.instance.reference();
   BuildContext context;
 
-  HomePageBody(this.context);
+  ListViewAnimalState(this.context);
 
   @override
   void initState() {
@@ -32,28 +32,18 @@ class HomePageBody extends State<MyApp> {
     });
   }
 
-  static Stream<String> newStream() =>
-      Stream.periodic(Duration(seconds: 1), (i) => "$i");
-
   @override
   Widget build(BuildContext context) {
-    return new StreamBuilder(
-        stream: FirebaseDatabase.instance.reference().child('animal').onValue,
-        builder: (context, snap) {
-          if (snap.hasError) return new Text('Error: ${snap.error}');
-          if (snap.data == null)
-            return new Center(
-              child: new CircularProgressIndicator(),
-            );
-          animals.clear();
-          loadData(snap.data.snapshot);
-          return loadListView();
-        });
+    DatabaseReference bd=  FirebaseDatabase.instance.reference().child('animal');
+    bd.once().then((DataSnapshot snapshot){
+      animals.clear();
+      loadData(snapshot);
+    });
+    return loadListView();
   }
 
   loadListView() {
-    return  Expanded(                         // wrap the ListView
-        child:new ListView.builder(
+    return  new ListView.builder(
         shrinkWrap: true,
         itemCount: animals.length,
         itemBuilder: (BuildContext ctxt, int index) {
@@ -65,7 +55,7 @@ class HomePageBody extends State<MyApp> {
               onDismissed: (direction) {
                 deleteItem(index);
               });
-        }));
+        });
   }
 
   void deleteItem(index) {
