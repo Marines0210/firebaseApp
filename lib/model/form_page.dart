@@ -29,7 +29,6 @@ class MyFormPageState extends State<FormPage> {
   final nameController = TextEditingController();
   final specieController = TextEditingController();
   final ageController = TextEditingController();
-  final imageController = TextEditingController();
   String genderValue = '';
   Animal animal;
   File galleryFile;
@@ -38,6 +37,17 @@ class MyFormPageState extends State<FormPage> {
 
   MyFormPageState(this.animal);
 
+  @override
+  void initState() {
+    super.initState();
+    if(animal!=null) {
+      nameController.text = animal.name;
+      specieController.text = animal.specie;
+      ageController.text = animal.age;
+      genderValue=animal.gender;
+      displaySelectedFile();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -67,6 +77,7 @@ class MyFormPageState extends State<FormPage> {
                       icon: const Icon(Icons.merge_type),
                       hintText: 'Es un perro, gato, iguana, etc',
                       labelText: 'Especie',
+
                     ),
                   ),
                   new TextFormField(
@@ -81,15 +92,7 @@ class MyFormPageState extends State<FormPage> {
                       //Que vamos a permitir en nuestras cajas de texto
                       WhitelistingTextInputFormatter.digitsOnly,
                     ],
-                  ), new RaisedButton(
-                      padding: const EdgeInsets.all(8.0),
-                      textColor: Colors.white,
-                      color: Colors.blue,
-                      child: new RaisedButton(
-                        child: new Text('Selecciona una imagen'),
-                        onPressed: imageSelectorGallery,
-                      )
-                  ), displaySelectedFile(),
+                  ),
                   new FormField(
                     builder: (FormFieldState state) {
                       return InputDecorator(
@@ -118,7 +121,15 @@ class MyFormPageState extends State<FormPage> {
                         ),
                       );
                     },
-                  ),
+                  ), new RaisedButton(
+                      padding: const EdgeInsets.all(8.0),
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      child: new RaisedButton(
+                        child: new Text('Selecciona una imagen'),
+                        onPressed: imageSelectorGallery,
+                      )
+                  ), displaySelectedFile(),
                   new Container(
                       padding: const EdgeInsets.only(left: 40.0, top: 20.0),
                       child: new RaisedButton(
@@ -146,26 +157,53 @@ class MyFormPageState extends State<FormPage> {
     return new SizedBox(
 //child: new Card(child: new Text(''+galleryFile.toString())),
 //child: new Image.file(galleryFile),
-      child: galleryFile == null
-          ? new Text('Foto no seleccionada!!')
-          : new Image.file(galleryFile),
+      child:imageLoad()
     );
   }
 
+  imageLoad(){
+    if(galleryFile == null){
+      if(animal!="" && animal.image!=null || animal.image!=""){
+        FadeInImage.assetNetwork(
+            placeholder: "img/cody.jpg",
+            image: animal.image,
+            height: 144.0,
+            width: 160.0
+        );
+      }else{
+        new Text('Foto no seleccionada!!');
+      }
+    }else{
+      new Image.file(galleryFile);
+    }
+  }
 
   void sendData() {
-    saveImageFirebase(nameController.text).then((_){
-      animalDb.push().set({
+    if(animal!=null){
+      animalDb.child(animal.key).set({
         'name': nameController.text,
         'specie': specieController.text,
         'age': ageController.text,
         'gender': genderValue,
-        'image': (urlImage)!=null?urlImage:"",
+        'image': (urlImage) != null ? urlImage : "",
       }).then((_) {
         //cerrar la ventana actual cerrar el contexto actual
         Navigator.pop(context);
       });
-    });
+    }else {
+      saveImageFirebase(nameController.text).then((_) {
+        animalDb.push().set({
+          'name': nameController.text,
+          'specie': specieController.text,
+          'age': ageController.text,
+          'gender': genderValue,
+          'image': (urlImage) != null ? urlImage : "",
+        }).then((_) {
+          //cerrar la ventana actual cerrar el contexto actual
+          Navigator.pop(context);
+        });
+      });
+    }
 
   }
   Future<void> saveImageFirebase(String imageId) async {

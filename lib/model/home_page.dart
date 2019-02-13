@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
       body: new SingleChildScrollView(
         child: new Column(
           children: <Widget>[
-            new MyApp(),
+            new MyApp(context),
           ],
         ),
       ),

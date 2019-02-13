@@ -1,11 +1,14 @@
 
 import 'package:app_fire/animal.dart';
+import 'package:app_fire/model/form_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 class CardAnimal extends StatelessWidget {
   Animal animal;
-  CardAnimal(this.animal);
+  BuildContext context;
+  CardAnimal(this.animal,this.context);
   @override
   Widget build(BuildContext context) {
     return item(this.animal); //Error, How do i pass the arguments?
@@ -13,7 +16,14 @@ class CardAnimal extends StatelessWidget {
 
 
   Widget item(Animal animal) {
-    return new Card(
+    return InkWell(
+        onTap: () {
+          Navigator.push(
+              this.context,
+              MaterialPageRoute(
+                  builder: (context) => FormPage(title: 'Nuevo animal',animal: animal)));
+        },
+      child: new Card(
       child: new Column(
         children: <Widget>[
           new Container(
@@ -26,7 +36,13 @@ class CardAnimal extends StatelessWidget {
                   height: 144.0,
                   width: 160.0
               )
-          ),
+          ),new Padding(
+    padding: new EdgeInsets.all(7.0),
+    child: new Text(
+        animal.name,
+        style: new TextStyle(fontSize: 18.0)
+      )
+    ),
           new Padding(
               padding: new EdgeInsets.all(7.0),
               child: new Row(
@@ -65,6 +81,6 @@ class CardAnimal extends StatelessWidget {
               ))
         ],
       ),
-    );
+      ) );
   }
-}
+  }
