@@ -1,127 +1,115 @@
 import 'package:app_fire/classes/Auth.dart';
-import 'package:app_fire/model/animal_page.dart';
+import 'package:app_fire/widgets/round_button.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title, this.auth, this.onSignIn}) : super(key: key);
 
   final String title;
-  final BaseAuth auth;
+  final Auth auth;
   final VoidCallback onSignIn;
 
   @override
-  _LoginPageState createState() => new _LoginPageState();
+  LoginPageState createState() => new LoginPageState();
 }
 
+//Vamos a crear un conjunto de contastes que vamos a poder acceder a estas a travez de FormType
 enum FormType {
   login,
   register
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
+  //variable para guardar y obteenr nuestro dormulario
   static final formKey = new GlobalKey<FormState>();
 
-  String _email;
-  String _password;
-  FormType _formType = FormType.login;
-  String _authHint = '';
+  //
+  var email  = TextEditingController();
+  var password = TextEditingController();
 
-  bool validateAndSave() {
-    final form = formKey.currentState;
-    if (form.validate()) {
-      form.save();
-      return true;
-    }
-    return false;
-  }
+  //Inicialisamos con login
+  FormType formType = FormType.login;
 
-  void validateAndSubmit() async {
-    if (validateAndSave()) {
+
+  //Creamos un metodo para especificar que hara nuestro boton
+  void validateSubmit() async {
       try {
-        String userId = _formType == FormType.login
-            ? await widget.auth.signIn(_email, _password)
-            : await widget.auth.createUser(_email, _password);
-        setState(() {
-          _authHint = 'Signed In\n\nUser id: $userId';
-        });
+        //si el tipo es igual a login entonces iniciamos session sino creamos la cuenta
+        String userId = formType == FormType.login
+            ? await widget.auth.signIn(email.text, password.text)
+            : await widget.auth.createUser(email.text, password.text);
         widget.onSignIn();
       }
       catch (e) {
         setState(() {
-          _authHint = 'Sign In Error\n\n${e.toString()}';
+        print('Error al iniciar session ${e.toString()}');
         });
         print(e);
       }
-    } else {
-      setState(() {
-        _authHint = '';
-      });
-    }
   }
 
   void moveToRegister() {
+    //reset el formulario y mostrar registrar
     formKey.currentState.reset();
     setState(() {
-      _formType = FormType.register;
-      _authHint = '';
+      formType = FormType.register;
     });
   }
 
   void moveToLogin() {
+    //reset el formulario y mostrar login
     formKey.currentState.reset();
     setState(() {
-      _formType = FormType.login;
-      _authHint = '';
+      formType = FormType.login;
     });
   }
 
+  //Creamos nuestro widget que tendra el usuario contraseña
   List<Widget> usernameAndPassword() {
     return [
       padded(child: new TextFormField(
-        key: new Key('email'),
+        controller: email,
         decoration: new InputDecoration(labelText: 'Email'),
         autocorrect: false,
-        validator: (val) => val.isEmpty ? 'Email can\'t be empty.' : null,
-        onSaved: (val) => _email = val,
+        validator: (val) => val.isEmpty ? 'El correo no puede estar vacio.' : null,
       )),
       padded(child: new TextFormField(
-        key: new Key('password'),
+        controller: password,
         decoration: new InputDecoration(labelText: 'Password'),
         obscureText: true,
         autocorrect: false,
-        validator: (val) => val.isEmpty ? 'Password can\'t be empty.' : null,
-        onSaved: (val) => _password = val,
+        validator: (val) => val.isEmpty ? 'La contraseña no puede estar vacia.': null,
       )),
     ];
   }
 
   List<Widget> submitWidgets() {
-    switch (_formType) {
+    switch (formType) {
+      //Verificamos que mostrar en el boton y text view si es tipo login o registrar
       case FormType.login:
         return [
-          new PrimaryButton(
-              key: new Key('login'),
-              text: 'Login',
+          //llamamos nuestra clase RoundButton que creamos
+          new RoundButton(
+              text: 'Iniciar Sesisión',
               height: 44.0,
-              onPressed: validateAndSubmit
+              onPressed: validateSubmit
           ),
           new FlatButton(
-              key: new Key('need-account'),
-              child: new Text("Need an account? Register"),
+              child: new Text("No tienes una cuenta? Registrate"),
               onPressed: moveToRegister
           ),
         ];
+        //Si es registrarse entonces mostramos el texto que corresponde
       case FormType.register:
         return [
-          new PrimaryButton(
-              key: new Key('register'),
-              text: 'Create an account',
+          new RoundButton(
+              text: 'Create cuenta',
               height: 44.0,
-              onPressed: validateAndSubmit
+              onPressed: validateSubmit
           ),
           new FlatButton(
-              key: new Key('need-login'),
-              child: new Text("Have an account? Login"),
+              child: new Text("Iniciar sesión"),
+              //Al dar clic mostramos login
               onPressed: moveToLogin
           ),
         ];
@@ -129,17 +117,6 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  Widget hintText() {
-    return new Container(
-      //height: 80.0,
-        padding: const EdgeInsets.all(32.0),
-        child: new Text(
-            _authHint,
-            key: new Key('hint'),
-            style: new TextStyle(fontSize: 18.0, color: Colors.grey),
-            textAlign: TextAlign.center)
-    );
-  }
 
 
   @override
@@ -169,7 +146,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ])
                   ),
-                  hintText()
                 ]
             )
         ))
@@ -186,73 +162,5 @@ class _LoginPageState extends State<LoginPage> {
 
 }
 
-class RootPage extends StatefulWidget {
-  RootPage({Key key, this.auth}) : super(key: key);
-  final BaseAuth auth;
 
-  @override
-  State<StatefulWidget> createState() => new _RootPageState();
-}
 
-enum AuthStatus {
-  notSignedIn,
-  signedIn,
-}
-
-class _RootPageState extends State<RootPage> {
-
-  AuthStatus authStatus = AuthStatus.notSignedIn;
-
-  initState() {
-    super.initState();
-    widget.auth.currentUser().then((userId) {
-      setState(() {
-        authStatus = userId != null ? AuthStatus.signedIn : AuthStatus.notSignedIn;
-      });
-    });
-  }
-
-  void _updateAuthStatus(AuthStatus status) {
-    setState(() {
-      authStatus = status;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    switch (authStatus) {
-      case AuthStatus.notSignedIn:
-        return new LoginPage(
-          title: 'Flutter Login',
-          auth: widget.auth,
-          onSignIn: () => _updateAuthStatus(AuthStatus.signedIn),
-        );
-      case AuthStatus.signedIn:
-        return new HomePage(
-            auth: widget.auth,
-            onSignOut: () => _updateAuthStatus(AuthStatus.notSignedIn)
-        );
-    }
-  }
-}
-class PrimaryButton extends StatelessWidget {
-  PrimaryButton({this.key, this.text, this.height, this.onPressed}) : super(key: key);
-  Key key;
-  String text;
-  double height;
-  VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return new ConstrainedBox(
-      constraints: BoxConstraints.expand(height: height),
-      child: new RaisedButton(
-          child: new Text(text, style: new TextStyle(color: Colors.white, fontSize: 20.0)),
-          shape: new RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(height / 2))),
-          color: Colors.blue,
-          textColor: Colors.black87,
-          onPressed: onPressed),
-    );
-  }
-}

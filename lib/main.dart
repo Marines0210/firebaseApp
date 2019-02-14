@@ -1,6 +1,6 @@
 
 import 'package:app_fire/classes/Auth.dart';
-import 'package:app_fire/model/login_page.dart';
+import 'package:app_fire/pages/root_page_state.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());

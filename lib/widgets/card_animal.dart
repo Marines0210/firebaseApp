@@ -1,6 +1,6 @@
 
 import 'package:app_fire/classes/animal.dart';
-import 'package:app_fire/model/animal_form_page.dart';
+import 'package:app_fire/pages/animal_form_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';

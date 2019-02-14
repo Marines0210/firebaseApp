@@ -1,13 +1,13 @@
 import 'package:app_fire/classes/Auth.dart';
+import 'package:app_fire/pages/animal_form_page.dart';
 import 'package:app_fire/widgets/listview_animal.dart';
-import 'package:app_fire/model/animal_form_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({this.auth, this.onSignOut});
-  final BaseAuth auth;
+  final Auth auth;
   final VoidCallback onSignOut;
   @override
   Widget build(BuildContext context) {
