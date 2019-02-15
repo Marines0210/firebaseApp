@@ -16,11 +16,13 @@ class CardAnimal extends StatelessWidget {
 
 
   Widget item(Animal animal) {
+    //InkWell click en cada cardview
     return InkWell(
         onTap: () {
           Navigator.push(
               this.context,
               MaterialPageRoute(
+                //Enviamos a nuevo pero con el objeto lleno por lo cual detectara como ieditar
                   builder: (context) => FormAnimal(title: 'Nuevo animal',animal: animal)));
         },
       child: new Card(
@@ -30,6 +32,7 @@ class CardAnimal extends StatelessWidget {
               height: 144.0,
               width: 500.0,
               color: Colors.green,
+              //Imagen por default o imagen de internet
               child: FadeInImage.assetNetwork(
                   placeholder: "img/cody.jpg",
                   image: animal.image,

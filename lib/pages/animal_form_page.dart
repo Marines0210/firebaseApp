@@ -24,7 +24,10 @@ class FormAnimal extends StatefulWidget {
 }
 
 class MyFormPageState extends State<FormAnimal> {
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+
+  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
+
+  //Dos formas para obtener los widgent con cotroller y con key
   List<String> genders = <String>['', 'Macho', 'Hembra'];
   final nameController = TextEditingController();
   final specieController = TextEditingController();
@@ -40,6 +43,7 @@ class MyFormPageState extends State<FormAnimal> {
   @override
   void initState() {
     super.initState();
+    //Detectamos si es editar llenamos todos los campos con los datos correspondientes
     if(animal!=null) {
       nameController.text = animal.name;
       specieController.text = animal.specie;
@@ -57,9 +61,11 @@ class MyFormPageState extends State<FormAnimal> {
       body: new SafeArea(
           top: false,
           bottom: false,
+          //Crear dormulario
           child: new Form(
-              key: _formKey,
+              key: formKey,
               autovalidate: true,
+              //Lo agregamos a una lista
               child: new ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: <Widget>[
@@ -121,6 +127,7 @@ class MyFormPageState extends State<FormAnimal> {
                         ),
                       );
                     },
+                    //Botton para agregar seleccionar una imagen
                   ), new RaisedButton(
                       padding: const EdgeInsets.all(8.0),
                       textColor: Colors.white,
@@ -130,6 +137,7 @@ class MyFormPageState extends State<FormAnimal> {
                         onPressed: imageSelectorGallery,
                       )
                   ), displaySelectedFile(),
+                  //Guardar
                   new Container(
                       padding: const EdgeInsets.only(left: 40.0, top: 20.0),
                       child: new RaisedButton(
@@ -143,16 +151,17 @@ class MyFormPageState extends State<FormAnimal> {
     );
   }
 
+  //ImagePicker para seleccionar una imagen de la galeria hay dependencia "image_picker: 0.5.0+3"
   imageSelectorGallery() async {
     galleryFile = await ImagePicker.pickImage(
       source: ImageSource.gallery,
       maxHeight: 800.0,
       maxWidth: 700.0,
     );
-    print("Imagen seleccionada : " + galleryFile.path);
     setState(() {});
   }
 
+  //Mostrar imagen seleccionada
   Widget displaySelectedFile() {
     return new SizedBox(
       child: (galleryFile == null)
@@ -163,6 +172,7 @@ class MyFormPageState extends State<FormAnimal> {
 
 
 
+  //Si es editar tenemos enviamos key para actualizar el elemento sino es crear
   void sendData() {
     if(animal!=null){
       animalDb.child(animal.key).set({
@@ -191,6 +201,7 @@ class MyFormPageState extends State<FormAnimal> {
     }
 
   }
+  //Guardar imagen en firebase aqui hay que agregar dependencia "firebase_storage"
   Future<void> saveImageFirebase(String imageId) async {
     StorageReference ref = FirebaseStorage.instance.ref().child("pets").child(
         imageId);

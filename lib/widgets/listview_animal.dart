@@ -22,11 +22,13 @@ class ListViewAnimalState extends State<ListViewAnimal> {
   @override
   void initState() {
     super.initState();
-    mainReference.onChildAdded.listen(_onEntryAdded);
+    //evnto para recargar la lista cuando se reciba push de firebase
+    mainReference.onChildAdded.listen(onEntryAdded);
   }
 
-  _onEntryAdded(Event event) {
+  onEntryAdded(Event event) {
     setState(() {
+      //limpiar la lista para actualizar
       animals.clear();
       loadData(event.snapshot);
     });
@@ -34,6 +36,7 @@ class ListViewAnimalState extends State<ListViewAnimal> {
 
   @override
   Widget build(BuildContext context) {
+    //obtener la lista de registros en firebase
     DatabaseReference bd=  FirebaseDatabase.instance.reference().child('animal');
     bd.once().then((DataSnapshot snapshot){
       animals.clear();
@@ -42,11 +45,14 @@ class ListViewAnimalState extends State<ListViewAnimal> {
     return loadListView();
   }
 
+  //Widget list
   loadListView() {
+    //builder para detectar cambios y actualizar
     return  new ListView.builder(
         shrinkWrap: true,
         itemCount: animals.length,
         itemBuilder: (BuildContext ctxt, int index) {
+          //Dismissible swipe para eliminar
           return Dismissible(
               key: ObjectKey(animals[index]),
               child: Container(
@@ -58,6 +64,7 @@ class ListViewAnimalState extends State<ListViewAnimal> {
         });
   }
 
+  //Eliminar item de firebase y de la lista
   void deleteItem(index) {
     setState(() {
       FirebaseDatabase.instance
@@ -69,24 +76,17 @@ class ListViewAnimalState extends State<ListViewAnimal> {
     });
   }
 
-  void undoDeletion(index, item) {
-    /*
-  This method accepts the parameters index and item and re-inserts the {item} at
-  index {index}
-  */
-    setState(() {
-      animals.insert(index, item);
-    });
-  }
 
+  //Obtener datos de firebase y guardarlos en un objeto animal y la lista animals
   void loadData(DataSnapshot snap) async {
     print(snap.key);
     print(snap);
+    //Obtenermos las llaves ya que no pueden ser agregadas al crear es el id de cada elemento
     final value = snap.value as Map;
     for (final key in value.keys) {
+      //de las llaves obtenemos los elementos
       Map<dynamic, dynamic> map = value[key];
-      print("holaaaaaaaaa");
-      print(map['name']);
+      //agregamos cada elemento al objeto y a la lista
       animals.add(new Animal(key, map['name'], map['specie'], map['age'],
           map['gender'], map['image']));
     }

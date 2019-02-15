@@ -21,6 +21,7 @@ class HomePage extends StatelessWidget {
     }
       return MaterialApp(
         home: Scaffold(
+          //floating para crear usuario
       floatingActionButton: new FloatingActionButton(
           shape: StadiumBorder(),
           onPressed: () {
@@ -39,7 +40,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(title: const Text('Adopcion'),
           actions: <Widget>[   new FlatButton(
           onPressed: _signOut,
-          child: new Text('Logout', style: new TextStyle(fontSize: 17.0, color: Colors.white))
+          child: new Text('Cerrar sesión', style: new TextStyle(fontSize: 17.0, color: Colors.white))
       )]),
     ));
   }
